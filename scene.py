@@ -24,7 +24,7 @@ class Scene:
             'player': 0,
             'enemy': 0
         }
-        level_multiplier = 50
+        level_multiplier = 10
         
         # spawn player
         player_pos = Vector2(self.width * 0.45, self.height * 0.8)
@@ -45,11 +45,11 @@ class Scene:
         # spawn 10 collectables at random positions ensure they are at least 50 pixels away from each other
         added_positions = []
         for i in range(10):
-            pos = Vector2(random.randint(0, self.width), random.randint(0, self.height))
+            pos = Vector2(random.randint(0, self.width - 100), random.randint(0, self.height - 100))
             for p in added_positions:
                 # ensure pos has the distance_to attribute
                 while Vector2(pos).distance_to(p) < 50:
-                    pos = (random.randint(0, self.width), random.randint(0, self.height))
+                    pos = (random.randint(0, self.width - 100), random.randint(0, self.height - 100))
             added_positions.append(pos)
             collectable_sprite = pygame.image.load('wf.png')
             self.collectables.append(Entity(pos, 0, collectable_sprite, 0))
@@ -63,7 +63,7 @@ class Scene:
         # draw the score
         text = self.font.render('Tink: ' + str(self.score['player']), False, (0, 0, 0))
         surface.blit(text, (10, 10))
-        text = self.font.render('Anya' + ' : ' + str(self.score['enemy']), False, (0, 0, 0))
+        text = self.font.render('Anya: ' + str(self.score['enemy']), False, (0, 0, 0))
         surface.blit(text, (10, 72))
 
         # draw the level
