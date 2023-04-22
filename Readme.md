@@ -8,24 +8,39 @@ The Cat Throne awaits ...
 # Controls
 Use WASD or the Arrow Keys to move
 
-# Building
-## Install dependencies
-```zsh
-python -m venv .venv
-```
-At this point, vscode will ask you to activate things, say yes!
-ur powershell should look like (.venv) PS C:\Users\ etc... now
-```zsh
-pip install -r requirements.txt
-```
+## Build for Multiple Platforms
+You can build for multiple platforms using CMake, you will need the following installed to link for your platform of choice 
+* SDL2
+* SDL2-image
+* SDL2-mixer
+* SDL2-ttf
+* libvorbis
+### Windows
+* You can install dependencies using [vcpkg](https://github.com/microsoft/vcpkg)
+    * for SDL_Mixer use ./vcpkg.exe install sdl2-mixer[libvorbis]
+    * you may need to remove SDL_Mixer first, sdl2-mixer[dynamic-load] causes issues with cmake
+* Open Project in Visual Studio (cmake support installed)
+* Build
+* Run SimpleGame.exe
 
-## Test pygame installation
+### Linux / MacOS
+* install dependencies using package manager i.e. apt, pacman, etc. for MacOS this would be [brew](https://brew.sh/)
 ```zsh
-python -m pygame.examples.aliens   
+mkdir build
+cd build
+cmake ..
+make
+./SimpleGame
 ```
-
-## Run Web
+### Web
 ```zsh
-pygbag .
+mkdir build
+cd build
+emcmake cmake ..
+emmake make
+emrun TinksWorld.html
 ```
-Click on the url in your terminal to open in browser
+ignore the following error after emmake make, emrun will work just fine
+```zsh
+assert '{{{ SCRIPT }}}' in shell, 'HTML shell must contain  {{{ SCRIPT }}}  , see src/shell.html for an example'
+```
