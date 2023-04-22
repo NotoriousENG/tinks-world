@@ -3,11 +3,15 @@
 #include <math.h>
 #include <stdio.h>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 vec2 vec2_new(float x, float y)
 {
 	return (vec2){ x, y };
 }
-
+  
 float vec2_length(vec2 v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y);

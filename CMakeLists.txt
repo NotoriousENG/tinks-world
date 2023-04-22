@@ -15,11 +15,10 @@ if( ${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${USE_FLAGS}")
     set(CMAKE_EXECUTABLE_SUFFIX .html)
 else()
-    include(FindPkgConfig)
-    pkg_search_module(SDL2 REQUIRED sdl2)
-    pkg_search_module(SDL2_MIXER REQUIRED SDL2_mixer)
-    pkg_search_module(SDL2_IMAGE REQUIRED SDL2_image)
-    pkg_search_module(SDL2_TTF REQUIRED SDL2_ttf)
+    find_package(SDL2 REQUIRED)
+    find_package(sdl2-mixer REQUIRED)
+    find_package(sdl2-image REQUIRED)
+    find_package(SDL2_TTF REQUIRED)
 endif()
 
 # Add source to this project's executable.
@@ -33,7 +32,19 @@ target_link_libraries(TinksWorld PRIVATE ${SDL2_LIBRARIES})
 target_link_libraries(TinksWorld PRIVATE ${SDL2_IMAGE_LIBRARIES})
 target_link_libraries(TinksWorld PRIVATE ${SDL2_MIXER_LIBRARIES}) # ensure sdl2-mixer "extensions" are installed for .ogg: https://www.reddit.com/r/cataclysmdda/comments/glxgtb/fix_for_sound_problem_when_compiling_in_windows/
 target_link_libraries(TinksWorld PRIVATE ${SDL2_TTF_LIBRARIES})
-target_link_libraries(TinksWorld PRIVATE m) # for math.h
+find_library(MATH_LIBRARY m)
+if(MATH_LIBRARY)
+    target_link_libraries(MyTarget PUBLIC ${MATH_LIBRARY})
+endif()
+
+if (WIN32)
+    # /ENTRY:mainCRTStartup keeps the same "main" function instead of requiring "WinMain"
+    set(SUBSYSTEM_LINKER_OPTIONS "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
+else()
+    set(SUBSYSTEM_LINKER_OPTIONS "-mwindows")
+endif()
+
+target_link_options(TinksWorld PRIVATE ${SUBSYSTEM_LINKER_OPTIONS})
 
 add_custom_target(copy_assets
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_LIST_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets
