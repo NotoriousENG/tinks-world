@@ -18,7 +18,7 @@ else()
     find_package(SDL2 REQUIRED)
     find_package(sdl2-mixer REQUIRED)
     find_package(sdl2-image REQUIRED)
-    find_package(SDL2_TTF REQUIRED)
+    find_package(sdl2-ttf REQUIRED)
 endif()
 
 # Add source to this project's executable.
@@ -34,14 +34,12 @@ target_link_libraries(TinksWorld PRIVATE ${SDL2_MIXER_LIBRARIES}) # ensure sdl2-
 target_link_libraries(TinksWorld PRIVATE ${SDL2_TTF_LIBRARIES})
 find_library(MATH_LIBRARY m)
 if(MATH_LIBRARY)
-    target_link_libraries(MyTarget PUBLIC ${MATH_LIBRARY})
+    target_link_libraries(TinksWorld PUBLIC ${MATH_LIBRARY})
 endif()
 
 if (WIN32)
     # /ENTRY:mainCRTStartup keeps the same "main" function instead of requiring "WinMain"
     set(SUBSYSTEM_LINKER_OPTIONS "/SUBSYSTEM:WINDOWS" "/ENTRY:mainCRTStartup")
-else()
-    set(SUBSYSTEM_LINKER_OPTIONS "-mwindows")
 endif()
 
 target_link_options(TinksWorld PRIVATE ${SUBSYSTEM_LINKER_OPTIONS})
