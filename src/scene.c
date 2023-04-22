@@ -98,6 +98,34 @@ void playerLogic(Scene *scene, float delta)
 		     (scene->resources->keyboard[SDL_SCANCODE_UP] ||
 		      scene->resources->keyboard[SDL_SCANCODE_W]);
 
+	// if we get joystick input, use that instead
+	if (scene->resources->joystick != NULL) {
+		SDL_Joystick *joystick = scene->resources->joystick;
+
+		inputDir.x +=
+			(float)SDL_JoystickGetAxis(joystick, 0) / 32767.0f;
+		inputDir.y +=
+			(float)SDL_JoystickGetAxis(joystick, 1) / 32767.0f;
+
+		Uint8 hatState = SDL_JoystickGetHat(joystick, 0);
+		if (hatState & SDL_HAT_UP) {
+			inputDir.y -= 1;
+		}
+		if (hatState & SDL_HAT_DOWN) {
+			inputDir.y += 1;
+		}
+		if (hatState & SDL_HAT_LEFT) {
+			inputDir.x -= 1;
+		}
+		if (hatState & SDL_HAT_RIGHT) {
+			inputDir.x += 1;
+		}
+	}
+
+	// clamp the input x and y to -1 and 1
+	inputDir.x = clampf(inputDir.x, -1, 1);
+	inputDir.y = clampf(inputDir.y, -1, 1);
+
 	if (vec2_length(inputDir) > 0) {
 		inputDir = vec2_normalize(inputDir);
 	}
@@ -111,7 +139,7 @@ void playerLogic(Scene *scene, float delta)
 	// rotate the player to face in the direction they are moving
 	if (vec2_length(inputDir) > 0) {
 		float rot = vec2_angle_degrees(inputDir, (vec2){ 0, -1 });
-		player->rotation = roundf(rot / 90) * 90;
+		player->rotation = smooth_rotation(player->rotation, rot, 0.1f);
 	}
 
 	// if the player is off the screen by 100 pixels, wrap them around to the
@@ -158,7 +186,8 @@ void enemyLogic(Scene *scene, float delta)
 		// rotate the enemy to face in the direction they are moving
 		if (vec2_length(dir) > 0) {
 			float rot = vec2_angle_degrees(dir, (vec2){ 0, -1 });
-			enemy->rotation = roundf(rot / 90) * 90;
+			enemy->rotation =
+				smooth_rotation(enemy->rotation, rot, 0.1f);
 		}
 
 		enemy->position =
@@ -202,4 +231,18 @@ void collectableLogic(Scene *scene)
 		}
 		scene_begin(scene);
 	}
+}
+
+float smooth_rotation(float from_rot, float to_rot, float delta)
+{
+	// fix lerping the rotation for 0 and 360 degrees
+	if (from_rot > 270 && to_rot < 90) {
+		from_rot -= 360;
+	}
+	if (from_rot < 90 && to_rot > 270) {
+		from_rot += 360;
+	}
+
+	// lerping the rotation makes it look smoother
+	return lerpf(from_rot, to_rot, delta);
 }

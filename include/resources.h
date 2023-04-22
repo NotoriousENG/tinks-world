@@ -16,6 +16,7 @@ struct Resources {
 	SDL_Texture *anya;
 	SDL_Texture *food;
 	int keyboard[MAX_KEYBOARD_KEYS];
+	SDL_Joystick *joystick;
 	int running;
 };
 
@@ -41,5 +42,7 @@ void play_music_on_loop(Mix_Music *music);
 void doKeyUp(int *keyboard, SDL_KeyboardEvent *event);
 
 void doKeyDown(int *keyboard, SDL_KeyboardEvent *event);
+
+void handleJoystick(SDL_JoyAxisEvent *event);
 
 void doInput(int *keyboard);

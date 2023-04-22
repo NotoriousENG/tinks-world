@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 
 	windowFlags = 0;
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0) {
 		printf("Couldn't initialize SDL: %s\n", SDL_GetError());
 		exit(1);
 	}
@@ -103,9 +103,14 @@ int main(int argc, char *argv[])
 		printf("Couldn't initialize SDL Image\n");
 		exit(1);
 	}
+
+	if (SDL_NumJoysticks() < 1) {
+		printf("No joysticks connected\n");
+	}
 	// End of boilerplate code
 
 	resources = load_resources(renderer);
+
 	play_music_on_loop(resources.music);
 
 	atexit(cleanup);

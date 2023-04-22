@@ -9,6 +9,7 @@ Resources load_resources(SDL_Renderer *renderer)
 	resources.tink = loadTexture(renderer, "assets/tink.png");
 	resources.anya = loadTexture(renderer, "assets/anya.png");
 	resources.food = loadTexture(renderer, "assets/wf.png");
+	resources.joystick = SDL_JoystickOpen(0);
 	return resources;
 }
 
@@ -19,6 +20,10 @@ void free_resources(Resources resources)
 	SDL_DestroyTexture(resources.tink);
 	SDL_DestroyTexture(resources.anya);
 	SDL_DestroyTexture(resources.food);
+
+	if (resources.joystick != NULL) {
+		SDL_JoystickClose(resources.joystick);
+	}
 }
 
 Mix_Music *load_music(char *filename)
@@ -136,7 +141,6 @@ void doInput(int *keyboard)
 		case SDL_KEYDOWN:
 			doKeyDown(keyboard, &event.key);
 			break;
-
 		case SDL_KEYUP:
 			doKeyUp(keyboard, &event.key);
 			break;

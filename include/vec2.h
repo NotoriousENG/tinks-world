@@ -30,3 +30,9 @@ float vec2_distance(vec2 a, vec2 b);
 
 // Get the angle between two vectors in degrees
 float vec2_angle_degrees(vec2 a, vec2 b);
+
+// Linear interpolation between two floats
+float lerpf(float a, float b, float f);
+
+// Clamp a float between a min and max value
+float clampf(float value, float min, float max);

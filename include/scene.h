@@ -30,3 +30,5 @@ void playerLogic(Scene *scene, float delta);
 void enemyLogic(Scene *scene, float delta);
 
 void collectableLogic(Scene *scene);
+
+float smooth_rotation(float from_rot, float to_rot, float delta);

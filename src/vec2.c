@@ -11,7 +11,7 @@ vec2 vec2_new(float x, float y)
 {
 	return (vec2){ x, y };
 }
-  
+
 float vec2_length(vec2 v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y);
@@ -49,4 +49,20 @@ float vec2_angle_degrees(vec2 a, vec2 b)
 {
 	float angle = atan2f(b.x, b.y) - atan2f(a.x, a.y);
 	return angle * 180 / M_PI;
+}
+
+float lerpf(float a, float b, float f)
+{
+	return a * (1.0 - f) + (b * f);
+}
+
+float clampf(float value, float min, float max)
+{
+	if (value < min) {
+		return min;
+	} else if (value > max) {
+		return max;
+	} else {
+		return value;
+	}
 }
