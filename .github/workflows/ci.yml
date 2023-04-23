@@ -197,3 +197,65 @@ jobs:
           ./butler login
           ./butler push macos.zip NotoriousENG/tinks-world:macos-intel
           ./butler logout
+
+  release_windows:
+    name: Windows Release
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: install cmake
+        run: |
+          choco install cmake
+
+      - name: Setup vcpkg dependencies
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgJsonGlob: '**/vcpkg.json'
+          runVcpkgInstall: true
+
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Configure CMake (use vcpkg toolchain file and windows commands)
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{github.workspace}}/vcpkg/scripts/buildsystems/vcpkg.cmake -Wno-dev
+      
+      - name: Build
+        run: cmake --build ./build --config Release
+
+      - name: Create Artifact (using windows commands, copy exe, assets and all .dll files in the same folder)
+        run: |
+          mkdir release
+          copy build\Release\TinksWorld.exe release\TinksWorld.exe
+          copy build\Release\*.dll release
+          xcopy /E /I assets release\assets
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-release
+          path: release
+      
+      - name: Install Butler for Windows
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
+          unzip butler.zip
+          ./butler -V
+
+      - name: Create release zip and run Butler (using windows commands)
+
+        # Here we say that we will use the BUTLER_API_KEY as an environment variable
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          cd release
+          7z a ../windows.zip *
+          cd ..
+
+          # Butler will read the API key from the environment variable
+          ./butler login
+          ./butler push windows.zip NotoriousENG/tinks-world:windows
+          ./butler logout
