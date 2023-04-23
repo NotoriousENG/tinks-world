@@ -78,3 +78,65 @@ jobs:
           ./butler login
           ./butler push web.zip NotoriousENG/tinks-world:html5
           ./butler logout
+
+  release_linux:
+    name: Linux Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Install Packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y gcc-multilib python3 curl zip unzip
+          sudo apt-get install -y --no-install-recommends libx11-dev libxcursor-dev libxrandr-dev libxinerama-dev libxi-dev libxext-dev libxfixes-dev libgl1-mesa-dev
+      
+      - name: Install SDL packages and libvorbis
+        run: |
+          sudo apt-get install -y libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libvorbis-dev
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Wno-dev
+      
+      - name: Build
+        run: cmake --build ./build --config Release
+
+      - name: Create Artifact
+        run: |
+          mkdir release
+          cp build/TinksWorld release/TinksWorld
+          cp -r assets release/assets
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-release
+          path: release
+      
+      - name: Install Butler
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+          unzip butler.zip
+          chmod +x butler
+          ./butler -V
+
+      - name: Create release zip and run Butler
+
+        # Here we say that we will use the BUTLER_API_KEY as an environment variable
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          cd release
+          zip -r ../linux.zip *
+          cd ..
+
+          # Butler will read the API key from the environment variable
+          ./butler login
+          ./butler push linux.zip NotoriousENG/tinks-world:linux
+          ./butler logout
