@@ -140,3 +140,60 @@ jobs:
           ./butler login
           ./butler push linux.zip NotoriousENG/tinks-world:linux
           ./butler logout
+
+  release_macos:
+    name: MacOs Release
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+
+      - name: Initialize brew, install cmake, sdl2, sdl2_image, sdl2_mixer, sdl2_ttf, libvorbis
+        run: |
+          brew update
+          brew install cmake sdl2 sdl2_image sdl2_mixer sdl2_ttf libvorbis
+
+      - name: Create Build Directory
+        run: cmake -E make_directory ${{github.workspace}}/build
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -Wno-dev
+      
+      - name: Build
+        run: cmake --build ./build --config Release
+
+      - name: Create Artifact
+        run: |
+          mkdir release
+          cp build/TinksWorld release/TinksWorld
+          cp -r assets release/assets
+
+      - name: Publish Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: macos-release
+          path: release
+      
+      - name: Install Butler for macos
+        run: |
+          curl -L -o butler.zip https://broth.itch.ovh/butler/darwin-amd64/LATEST/archive/default
+          unzip butler.zip
+          chmod +x butler
+          ./butler -V
+
+      - name: Create release zip and run Butler
+
+        # Here we say that we will use the BUTLER_API_KEY as an environment variable
+        env:
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          cd release
+          zip -r ../macos.zip *
+          cd ..
+
+          # Butler will read the API key from the environment variable
+          ./butler login
+          ./butler push macos.zip NotoriousENG/tinks-world:macos-intel
+          ./butler logout
