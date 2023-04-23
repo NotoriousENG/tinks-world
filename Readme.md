@@ -40,7 +40,3 @@ emcmake cmake ..
 emmake make
 emrun TinksWorld.html
 ```
-ignore the following error after emmake make, emrun will work just fine
-```zsh
-assert '{{{ SCRIPT }}}' in shell, 'HTML shell must contain  {{{ SCRIPT }}}  , see src/shell.html for an example'
-```
