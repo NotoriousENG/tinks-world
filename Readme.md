@@ -5,6 +5,8 @@ If you beat Anya you will proceed to the next level where the speed increases. T
 
 The Cat Throne awaits ...
 
+Also check out [Dodge the Anyas!](https://notoriouseng.itch.io/dodge-the-anyas)
+
 # Controls
 Use WASD or the Arrow Keys to move
 
